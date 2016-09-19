@@ -1,5 +1,3 @@
-// Modified copy of https://github.com/eidheim/Simple-Web-Server/blob/master/server_http.hpp
-
 #ifndef SERVER_HTTP_HPP
 #define	SERVER_HTTP_HPP
 
@@ -13,6 +11,7 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#endif	/* SERVER_HTTP_HPP */
 
 namespace SimpleWeb {
     template <class socket_type>
@@ -357,7 +356,15 @@ namespace SimpleWeb {
                     if(!ec) {
                         if(timeout_content>0)
                             timer->cancel();
-                        auto http_version=stof(request->http_version);
+                        float http_version;
+                        try {
+                            http_version=stof(request->http_version);
+                        }
+                        catch(const std::exception &e){
+                            if(exception_handler)
+                                exception_handler(e);
+                            return;
+                        }
                         
                         auto range=request->header.equal_range("Connection");
                         for(auto it=range.first;it!=range.second;it++) {
@@ -412,4 +419,3 @@ namespace SimpleWeb {
         }
     };
 }
-#endif	/* SERVER_HTTP_HPP */
